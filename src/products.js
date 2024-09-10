@@ -6,7 +6,7 @@ async function productIdExists(id) {
         const [rows] = await connection.execute('SELECT 1 FROM products WHERE id = ?', [id]);
         return rows.length > 0;
     }catch (error){
-        console.log(error);
+        console.log(error.message);
     }finally {
         connection.release();
     }
@@ -20,7 +20,7 @@ async function createProduct(product) {
         console.log(`Produit à été ajouter avec succes.`);
         return result.insertId;
     }catch (error){
-        console.log(error);
+        console.log(error.message);
     }finally {
         connection.release();
     }
@@ -35,7 +35,7 @@ async function updateProduct(id, product) {
         console.log(`Produit avec id: ${id} à été modifier avec succes.`);
          
     }catch (error){
-        console.log(error);
+        console.log(error.message);
     }finally {
         connection.release();
     }
@@ -49,7 +49,7 @@ async function deleteProduct(id) {
         await connection.execute(query, [id]);
         console.log(`Produit avec id: ${id} à été supprumé.`)
     }catch (error){
-        console.log(error);
+        console.log("Echec de suppresion",error.message);
     } finally {
         connection.release();
     }
@@ -60,6 +60,8 @@ async function listProducts() {
         const query = 'SELECT * FROM products';
         const [rows] = await connection.execute(query);
         return rows;
+    }catch(error){
+        console.log(error.message);
     } finally {
         connection.release();
     }

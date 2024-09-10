@@ -23,6 +23,7 @@ async function main() {
             } else if (choices == 3) {
                 await comandeDetails()
             } else if (choices == 4) {
+                console.log('Au revoir!');
                 process.exit()
             }
             else {
@@ -170,8 +171,8 @@ async function comandeDetails() {
         console.log(`
             1. Ajouter un nouveau comande avec ses details
             2. Mettre à jour les information d'une commande et avec detailts
-            3. Supprimer un une commande et avec detailts
-            4. Liste tous les comandes avec ses details.
+            3. Supprimer une commande avec ses detailts
+            4. Liste une comande avec ses details.
             5. Retour
             6. Quitter
           `);
@@ -201,11 +202,12 @@ async function comandeDetails() {
                     status
                 };
 
-                let products = [];
+                let productDetails = [];
                 while (true) {
                     console.log(`
                         31. Ajouter un produit
-                        32. Sauvegarder et quitter
+                        32. Sauvegarder
+                        33. Annuler l'ajout ou Retourner 
                     `);
                     const choix = readline.question('Choisissez une option : ');
                     switch (choix) {
@@ -215,7 +217,6 @@ async function comandeDetails() {
                                 productId = readline.questionInt('ID du produit : ');
 
                                 if (await productIdExists(productId)) {
-                                    products.push(productId);
                                     break;
                                 } else {
                                     console.log(`Produit avec l'ID : ${productId} n'existe pas. Veuillez essayer un autre ID.`);
@@ -224,24 +225,29 @@ async function comandeDetails() {
                             const quantity = readline.questionInt('Quantite du produit : ');
                             const price = parseFloat(readline.question('Prix du produit : '));
 
-                            const details = {
+                            productDetails.push({
+                                productId,
                                 quantity,
-                                price,
-                                products
-                            };
-
-                            await createPurchaseDetails(order, details);
+                                price
+                            });
                             break;
-
                         case '32':
-                            console.log('Sauvegarde et sortie.');
-                            return comandeDetails();
-
+                            if (productDetails.length === 0) {
+                                console.log('Veuillez ajouter des produits avant de sauvegarder.');
+                            } else {
+                                await createPurchaseDetails(order, productDetails);
+                                console.log('Commande et détails sauvegardés avec succès.');
+                            }
+                            break;
+                        case '33':
+                            return comandeDetails(); 
                         default:
                             console.log('Choix invalide.');
                             break;
                     }
                 }
+
+
             case '2':
                 let purchaseIdToUpdate;
                 while (true) {
@@ -312,8 +318,18 @@ async function comandeDetails() {
                 }
                 break;
             case '4':
-                const purchaseDetails = await listPurchaseDetails();
-                console.log(purchaseDetails);
+                let purchaseIdToList;
+                while (true) {
+                    purchaseIdToList = readline.questionInt('ID du commande a afficher : ');
+                    if (await comandeIdExists(purchaseIdToList)) {
+
+                        const purchaseDetails = await listPurchaseDetails(purchaseIdToList);
+                        console.log(purchaseDetails);
+                        break;
+                    } else {
+                        console.log(`Commande avec l'ID : ${purchaseIdToList} n'existe pas. Veuillez essayer un autre ID.`);
+                    }
+                }
                 break;
             case '5':
                 return main();

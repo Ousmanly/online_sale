@@ -10,9 +10,34 @@ async function comandeIdExists(id) {
     }
 }
 
-async function createPurchaseDetails(order, details) {
+// async function createPurchaseDetails(order, details) {
+//     const connection = await pool.getConnection();
+//     try {
+//         const [result] = await connection.execute(
+//             'INSERT INTO purchase_orders (date, delivery_address, customer_id, track_number, status) VALUES (?, ?, ?, ?, ?)',
+//             [order.date, order.deliveryAddress, order.customerId, order.trackNumber, order.status]
+//         );
+
+//         const purchaseId = result.insertId;
+
+//         for (const productId of details.products) {
+//             await connection.execute(
+//                 'INSERT INTO order_details (quantity, price, purchase_id, product_id) VALUES (?, ?, ?, ?)',
+//                 [details.quantity, details.price, purchaseId, productId]
+//             );
+//         }
+
+//         console.log('Commande et détails créés avec succès.');
+//     } catch (error) {
+//         console.error('Erreur lors de la création de la commande et des détails :', error);
+//     } finally {
+//         connection.release();
+//     }
+// }
+async function createPurchaseDetails(order, productDetails) {
     const connection = await pool.getConnection();
     try {
+        // Insérer la commande
         const [result] = await connection.execute(
             'INSERT INTO purchase_orders (date, delivery_address, customer_id, track_number, status) VALUES (?, ?, ?, ?, ?)',
             [order.date, order.deliveryAddress, order.customerId, order.trackNumber, order.status]
@@ -20,32 +45,94 @@ async function createPurchaseDetails(order, details) {
 
         const purchaseId = result.insertId;
 
-        for (const productId of details.products) {
+        // Insérer les détails de chaque produit
+        for (const detail of productDetails) {
             await connection.execute(
                 'INSERT INTO order_details (quantity, price, purchase_id, product_id) VALUES (?, ?, ?, ?)',
-                [details.quantity, details.price, purchaseId, productId]
+                [detail.quantity, detail.price, purchaseId, detail.productId]
             );
         }
 
         console.log('Commande et détails créés avec succès.');
     } catch (error) {
-        console.error('Erreur lors de la création de la commande et des détails :', error);
+        console.error('Erreur lors de la création de la commande et des détails :', error.message);
     } finally {
         connection.release();
     }
 }
 
 
-async function listPurchaseDetails() {
+// async function listPurchaseDetails() {
+//     const connection = await pool.getConnection();
+//     try {
+//         const query = 'SELECT po.id AS purchase_id, po.date, po.delivery_address, po.customer_id, po.track_number, po.status, od.id AS detail_id, od.quantity, od.price, od.product_id FROM purchase_orders po JOIN order_details od ON po.id = od.purchase_id;';
+//         const [rows] = await connection.execute(query);
+//         // const query = 'SELECT * FROM purchase_orders';
+//         // const [rows] = await connection.execute(query);
+
+//         // const detail = 'SELECT * FROM order_details';
+//         // const [result] = await connection.execute(detail);
+//         // const tab = [rows, result ]
+//         // return tab ;
+//         return rows ;
+//     } finally {
+//         connection.release();
+//     }
+// }
+
+// async function listPurchaseDetails() {
+//     const connection = await pool.getConnection();
+//     try {
+//         const purchaseQuery = 'SELECT * FROM purchase_orders';
+//         const [purchaseRows] = await connection.execute(purchaseQuery);
+
+//         const result = [];
+
+//         for (const purchase of purchaseRows) {
+//             const detailsQuery = 'SELECT * FROM order_details WHERE purchase_id = ?';
+//             const [detailsRows] = await connection.execute(detailsQuery, [purchase.id]);
+            
+//             result.push({
+//                 purchase,
+//                 details: detailsRows
+//             });
+//         }
+
+//         return result;
+//     } catch (error) {
+//         console.error('Erreur lors de la récupération des commandes et des détails :', error.message);
+//         throw error;
+//     } finally {
+//         connection.release();
+//     }
+// }
+
+async function listPurchaseDetails(purchaseId) {
     const connection = await pool.getConnection();
     try {
-        const query = 'SELECT po.id AS purchase_id, po.date, po.delivery_address, po.customer_id, po.track_number, po.status, od.id AS detail_id, od.quantity, od.price, od.product_id FROM purchase_orders po JOIN order_details od ON po.id = od.purchase_id;';
-        const [rows] = await connection.execute(query);
-        return rows;
+        const purchaseQuery = 'SELECT * FROM purchase_orders WHERE id = ?';
+        const [purchaseRows] = await connection.execute(purchaseQuery, [purchaseId]);
+        const purchase = purchaseRows[0]; 
+
+        if (!purchase) {
+            throw new Error(`Commande avec l'ID ${purchaseId} n'existe pas.`);
+        }
+        const detailsQuery = 'SELECT quantity, price, product_id FROM order_details WHERE purchase_id = ?';
+        const [detailsRows] = await connection.execute(detailsQuery, [purchaseId]);
+        const details = detailsRows; 
+
+        return {
+            purchase,
+            details
+        };
+    } catch (error) {
+        console.error('Erreur lors de la récupération de la commande et des détails :', error.message);
+        throw error;
     } finally {
         connection.release();
     }
 }
+
 
 async function deletePurchaseDetails(purchaseId) {
     const connection = await pool.getConnection();
