@@ -42,16 +42,10 @@ async function deleteClient(id) {
     const connection = await pool.getConnection();
     try {
 
-        // const checkId = 'SELECT COUNT(*) AS count FROM customers WHERE id = ?';
-        // const [rows] = await connection.execute(checkId, [id]);
-
-        // if (rows[0].count === 0) {
-        //     console.log(`Client avec cette id: ${id} n'existe pas.`);
-        // }else{
-            const query = 'DELETE FROM customers WHERE id = ?';
-            await connection.execute(query, [id]);
-            console.log(`Client avec id: ${id} à été supprumé.`)
-        // }
+        const query = 'DELETE FROM customers WHERE id = ?';
+        await connection.execute(query, [id]);
+        console.log(`Client avec id: ${id} à été supprumé.`)
+       
     }catch (error){
         console.log(error);
     } finally {
