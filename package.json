@@ -1,0 +1,18 @@
+{
+  "name": "online_sale",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npx nodemon ./src/app.js"
+  },
+  "keywords": [],
+  "author": "ousmaneLy",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "mysql2": "^3.11.0",
+    "nodemon": "^3.1.4",
+    "readline-sync": "^1.4.10"
+  }
+}
