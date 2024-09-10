@@ -201,33 +201,51 @@ async function comandeDetails() {
                     status
                 };
 
-                const quantity = readline.questionInt('Quantite du produit : ');
-                const price = parseFloat(readline.question('Prix du produit : '));
-
-                let productId;
+                let products = [];
                 while (true) {
-                    productId = readline.questionInt('ID du produit : ');
+                    console.log(`
+                        31. Ajouter un produit
+                        32. Sauvegarder et quitter
+                    `);
+                    const choix = readline.question('Choisissez une option : ');
+                    switch (choix) {
+                        case '31':
+                            let productId;
+                            while (true) {
+                                productId = readline.questionInt('ID du produit : ');
 
-                    if (await productIdExists(productId)) {
-                        break;
-                    } else {
-                        console.log(`Produit avec l'ID : ${productId} n'existe pas. Veuillez essayer un autre ID.`);
+                                if (await productIdExists(productId)) {
+                                    products.push(productId);
+                                    break;
+                                } else {
+                                    console.log(`Produit avec l'ID : ${productId} n'existe pas. Veuillez essayer un autre ID.`);
+                                }
+                            }
+                            const quantity = readline.questionInt('Quantite du produit : ');
+                            const price = parseFloat(readline.question('Prix du produit : '));
+
+                            const details = {
+                                quantity,
+                                price,
+                                products
+                            };
+
+                            await createPurchaseDetails(order, details);
+                            break;
+
+                        case '32':
+                            console.log('Sauvegarde et sortie.');
+                            return comandeDetails();
+
+                        default:
+                            console.log('Choix invalide.');
+                            break;
                     }
                 }
-
-                const details = {
-                    quantity,
-                    price,
-                    productId
-                };
-
-                await createPurchaseDetails(order, details);
-                break;
-
             case '2':
                 let purchaseIdToUpdate;
                 while (true) {
-                    purchaseIdToUpdate = readline.questionInt('ID de commande à modifier : ');
+                    purchaseIdToUpdate = readline.questionInt('ID de commande a modifier : ');
 
                     if (await comandeIdExists(purchaseIdToUpdate)) {
                         break;
@@ -249,7 +267,7 @@ async function comandeDetails() {
                     }
                 }
 
-                const newTrackNumber = readline.question('Numéro de suivi : ');
+                const newTrackNumber = readline.question('Numero de suivi : ');
                 const newStatus = readline.question('Statut de la commande : ');
 
                 const ordersUpdate = {
@@ -260,7 +278,7 @@ async function comandeDetails() {
                     status: newStatus
                 };
 
-                const newQuantity = readline.questionInt('Quantité du produit : ');
+                const newQuantity = readline.questionInt('Quantite du produit : ');
                 const newPrice = parseFloat(readline.question('Prix du produit : '));
                 let productIdUpdate;
                 while (true) {

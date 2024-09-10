@@ -20,10 +20,12 @@ async function createPurchaseDetails(order, details) {
 
         const purchaseId = result.insertId;
 
-        await connection.execute(
-            'INSERT INTO order_details (quantity, price, purchase_id, product_id) VALUES (?, ?, ?, ?)',
-            [details.quantity, details.price, purchaseId, details.productId]
-        );
+        for (const productId of details.products) {
+            await connection.execute(
+                'INSERT INTO order_details (quantity, price, purchase_id, product_id) VALUES (?, ?, ?, ?)',
+                [details.quantity, details.price, purchaseId, productId]
+            );
+        }
 
         console.log('Commande et détails créés avec succès.');
     } catch (error) {
@@ -32,6 +34,7 @@ async function createPurchaseDetails(order, details) {
         connection.release();
     }
 }
+
 
 async function listPurchaseDetails() {
     const connection = await pool.getConnection();
@@ -73,23 +76,20 @@ async function updatePurchaseDetails(purchaseId, order, details) {
             [order.date, order.deliveryAddress, order.customerId, order.trackNumber, order.status, purchaseId]
         );
 
-        console.log(`Commande avec id: ${purchaseId} a été modifiée avec succès.`);
-
+        console.log(`Commande avec l'ID : ${purchaseId} a été modifiée avec succès.`);
         await connection.execute(
-            'DELETE FROM order_details WHERE purchase_id = ?',
-            [purchaseId]
-        );
-        
-        await connection.execute(
-            'INSERT INTO order_details (quantity, price, purchase_id, product_id) VALUES (?, ?, ?, ?)',
+            'UPDATE order_details SET quantity = ?, price = ? WHERE purchase_id = ? AND product_id = ?',
             [details.quantity, details.price, purchaseId, details.productId]
         );
+
+        console.log(`Détails de la commande pour le produit avec l'ID : ${details.productId} ont été modifiés avec succès.`);
     } catch (error) {
         console.error('Erreur lors de la mise à jour de la commande et des détails :', error.message);
     } finally {
         connection.release();
     }
 }
+
 
 module.exports = {
     createPurchaseDetails,
