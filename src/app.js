@@ -1,7 +1,7 @@
 const readline = require('readline-sync');
-const { clientIdExists, createClient, updateClient, deleteClient, listClients } = require('./customers');
-const { listProducts, createProduct, updateProduct, deleteProduct, productIdExists } = require('./products');
-const { createPurchaseDetails, listPurchaseDetails, deletePurchaseDetails, comandeIdExists, updatePurchaseDetails } = require('./comandeDetails');
+const { clientIdExists, createClient, updateClient, deleteClient, listClients } = require('./customerModule');
+const { listProducts, createProduct, updateProduct, deleteProduct, productIdExists } = require('./productModule');
+const { createPurchaseDetails, listPurchaseDetails, deletePurchaseDetails, comandeIdExists, updatePurchaseDetails } = require('./comandeDetailModule');
 
 
 async function main() {
