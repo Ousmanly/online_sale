@@ -2,6 +2,7 @@ const readline = require('readline-sync');
 const { clientIdExists, createClient, updateClient, deleteClient, listClients } = require('./customerModule');
 const { listProducts, createProduct, updateProduct, deleteProduct, productIdExists } = require('./productModule');
 const { createPurchaseDetails, listPurchaseDetails, deletePurchaseDetails, comandeIdExists, updatePurchaseDetails } = require('./comandeDetailModule');
+const { createPayment, paymentIdExists, updatePayment, deletePayment, listPayments } = require('./payementModule');
 
 
 async function main() {
@@ -11,7 +12,8 @@ async function main() {
              1. Les clients
              2. Les produits
              3. Les commandes et ses details
-             4. Quitter
+             4. Les payements
+             5. Quitter
            `);
 
         const choices = readline.question('Choisissez une option: ');
@@ -23,9 +25,11 @@ async function main() {
             } else if (choices == 3) {
                 await comandeDetails()
             } else if (choices == 4) {
+                await payement();
+            } else if (choices == 5) {
                 console.log('Au revoir!');
                 process.exit()
-            }
+            } 
             else {
                 console.log('Option est invalide');
             }
@@ -207,7 +211,7 @@ async function comandeDetails() {
                     console.log(`
                         31. Ajouter un produit
                         32. Sauvegarder
-                        33. Annuler l'ajout ou Retourner 
+                        33. Annuler l'ajout 
                     `);
                     const choix = readline.question('Choisissez une option : ');
                     switch (choix) {
@@ -237,6 +241,7 @@ async function comandeDetails() {
                             } else {
                                 await createPurchaseDetails(order, productDetails);
                                 console.log('Commande et détails sauvegardés avec succès.');
+                                return comandeDetails(); 
                             }
                             break;
                         case '33':
@@ -330,6 +335,93 @@ async function comandeDetails() {
                         console.log(`Commande avec l'ID : ${purchaseIdToList} n'existe pas. Veuillez essayer un autre ID.`);
                     }
                 }
+                break;
+            case '5':
+                return main();
+            case '6':
+                console.log('Au revoir!');
+                process.exit(0);
+            default:
+                console.log('Choix invalide.');
+        }
+    }
+}
+
+async function payement() {
+    while (true) {
+        console.log(`
+            1. Ajouter un nouveau payement
+            2. Mettre à jour les information d'un payement
+            3. Supprimer un payement
+            4. Liste tous les payements.
+            5. Retour
+            6. Quitter
+          `);
+        const choice = readline.question('Choisissez une option: ');
+        switch (choice) {
+            case '1':
+                const date = readline.question('Date : ');
+                const amount = parseFloat(readline.question('Montant : '))
+                const PMethode = readline.question('Methode de payement : ');
+                let purchaseId;
+                while (true) {
+                    purchaseId = readline.questionInt('ID de la commande : ');
+
+                    if (await comandeIdExists(purchaseId)) {
+                        break;
+                    } else {
+                        console.log(`Commande avec l'ID : ${purchaseId} n'existe pas. Veuillez essayer un autre ID.`);
+                    }
+                }
+                const payement = {
+                    date:date, 
+                    amount:amount, 
+                    p_methode:PMethode, 
+                    purchase_id: purchaseId
+                }
+                await createPayment(payement)
+                break;
+            case '2':
+                let paymentIdToUpdate;
+                while (true) {
+                    paymentIdToUpdate = readline.questionInt('ID payement a modifier : ');
+
+                    if (await paymentIdExists(paymentIdToUpdate)) {
+                        break;
+                    } else {
+                        console.log(`Payement avec l'ID : ${paymentIdToUpdate} n'existe pas. Veuillez essayer un autre ID.`);
+                    }
+                }
+                const newDate = readline.question('Date : ');
+                const newAmount = parseFloat(readline.question('Montant : '))
+                const newPMethode = readline.question('Methode de payement : ');
+                let NewPurchaseId;
+                while (true) {
+                    NewPurchaseId = readline.questionInt('ID de la commande : ');
+
+                    if (await comandeIdExists(NewPurchaseId)) {
+                        break;
+                    } else {
+                        console.log(`Commande avec l'ID : ${NewPurchaseId} n'existe pas. Veuillez essayer un autre ID.`);
+                    }
+                }
+                await updatePayment(paymentIdToUpdate, { date: newDate, amount: newAmount, p_methode: newPMethode, purchase_id: NewPurchaseId });
+                break;
+            case '3':
+                let payementIdToDelete;
+                while (true) {
+                    payementIdToDelete = readline.questionInt('ID payement a supprimer : ');
+                    if (await paymentIdExists(payementIdToDelete)) {
+                        await deletePayment(payementIdToDelete);
+                        break;
+                    } else {
+                        console.log(`Payement avec l'ID : ${payementIdToDelete} n'existe pas. Veuillez essayer un autre ID.`);
+                    }
+                }
+                break;
+            case '4':
+                const payements = await listPayments();
+                console.table(payements);
                 break;
             case '5':
                 return main();
