@@ -18,7 +18,7 @@ async function createPayment(payments) {
         console.log(`Payement a été ajouter avec succes.`);
         return result.insertId;
     }catch(error){
-        console.log(error);
+        console.log(error.message);
     } finally {
         connection.release();
     }
@@ -60,6 +60,8 @@ async function listPayments() {
         const query = 'SELECT * FROM payments';
         const [rows] = await connection.execute(query);
         return rows;
+    }catch (error){
+        console.log(error.message);
     } finally {
         connection.release();
     }

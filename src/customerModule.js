@@ -17,6 +17,8 @@ async function createClient(client) {
         const [result] = await connection.execute(query, [client.name, client.address, client.email, client.phone]);
         console.log(`Client à été ajouter avec succes.`);
         return result.insertId;
+    }catch(error){
+        console.log("Erreur lors d'insertion du client ",error.message);
     } finally {
         connection.release();
     }
@@ -31,7 +33,7 @@ async function updateClient(id, client) {
         console.log(`Client avec id: ${id} à été modifier avec succes.`);
          
     }catch (error){
-        console.log(error);
+        console.log(error.message);
     }finally {
         connection.release();
     }
@@ -47,7 +49,7 @@ async function deleteClient(id) {
         console.log(`Client avec id: ${id} à été supprumé.`)
        
     }catch (error){
-        console.log(error);
+        console.log(error.message);
     } finally {
         connection.release();
     }
@@ -58,6 +60,8 @@ async function listClients() {
         const query = 'SELECT * FROM customers';
         const [rows] = await connection.execute(query);
         return rows;
+    }catch (error){
+        console.log(error.message);
     } finally {
         connection.release();
     }

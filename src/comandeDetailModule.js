@@ -29,7 +29,7 @@ async function createPurchaseDetails(order, productDetails) {
 
         console.log('Commande et détails créés avec succès.');
     } catch (error) {
-        console.error('Erreur lors de la création de la commande et des détails :', error.message);
+        console.log('Erreur lors de la création de la commande et des détails :', error.message);
     } finally {
         connection.release();
     }
@@ -54,7 +54,7 @@ async function listPurchaseDetails(purchaseId) {
             details
         };
     } catch (error) {
-        console.error('Erreur lors de la récupération de la commande et des détails :', error.message);
+        console.log('Erreur lors de la récupération de la commande et des détails :', error.message);
         throw error;
     } finally {
         connection.release();
@@ -99,7 +99,7 @@ async function updatePurchaseDetails(purchaseId, order, details) {
 
         console.log(`Détails de la commande pour le produit avec l'ID : ${details.productId} ont été modifiés avec succès.`);
     } catch (error) {
-        console.error('Erreur lors de la mise à jour de la commande et des détails :', error.message);
+        console.log('Erreur lors de la mise à jour de la commande et des détails :', error.message);
     } finally {
         connection.release();
     }
