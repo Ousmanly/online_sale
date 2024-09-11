@@ -23,7 +23,7 @@ Ce projet est une evolution d'une base de données existante et mise en place de
 - Clonez ce dépôt :
 
     ```bash
-        git clone https://github.com/Ousmanly/gestion-projet-express.git
+        git clone https://github.com/Ousmanly/online_sale.git
     ```
 
 ## Utilisation

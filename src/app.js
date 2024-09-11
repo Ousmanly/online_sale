@@ -289,8 +289,6 @@ async function comandeDetails() {
                     status: newStatus
                 };
 
-                const newQuantity = readline.questionInt('Quantite du produit : ');
-                const newPrice = parseFloat(readline.question('Prix du produit : '));
                 let productIdUpdate;
                 while (true) {
                     productIdUpdate = readline.questionInt('ID du produit : ');
@@ -301,6 +299,10 @@ async function comandeDetails() {
                         console.log(`Produit avec l'ID : ${productIdUpdate} n'existe pas. Veuillez essayer un autre ID.`);
                     }
                 }
+                
+                const newQuantity = readline.questionInt('Quantite du produit : ');
+                const newPrice = parseFloat(readline.question('Prix du produit : '));
+                
                 const detailsUpdate = {
                     quantity: newQuantity,
                     price: newPrice,
