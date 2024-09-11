@@ -4,7 +4,7 @@ Ce projet est une evolution d'une base de données existante et mise en place de
 
 ## Fonctionnalités
 
-- **comandeDetailModel**
+- **orderModule**
   - Créer, lire, mettre à jour et supprimer des commandes avec ses details.
 
 - **customerModule**
@@ -16,15 +16,24 @@ Ce projet est une evolution d'une base de données existante et mise en place de
 - **productModule**
   - Créer, lire, mettre à jour et supprimer des produits.
 
+### Prérequis
+
+- [Node.js](https://nodejs.org/) (version 14 ou supérieure)
+- [MySQL](https://www.mysql.com/) (version 5.7 ou supérieure)
+
 ## Installation
-- initialisé le projet: `npm init`
-- mysql2 : `npm i mysql2`
-- bodyParser: `npm i readline-sync`
-- Clonez ce dépôt :
+1. Clonez le dépôt :
 
     ```bash
         git clone https://github.com/Ousmanly/online_sale.git
     ```
+2. Installer les dépendances:  
+    `npm install`
+3. Configurer la base de données
+
+  - Assurez-vous que Mysql est en cours d'exécution sur votre machine locale.
+  - Mettez les paramètres de connexion dans `db.js`.
+ 
 
 ## Utilisation
 
@@ -32,9 +41,8 @@ Ce projet est une evolution d'une base de données existante et mise en place de
 
     ```bash
         cd online_sale
-        cd src
     ```
-- Lancer le projet : `npm node app.js`
+- Lancer le projet : `node src/app.js`
 ## Author
 - **GitHub** : [Ousmane Ly](https://github.com/Ousmanly)
 - **LinkedIn** : [Ousmane Ly](www.linkedin.com/in/ousmane-ibrahima-ly-a270a4290)

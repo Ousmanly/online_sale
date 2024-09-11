@@ -1,7 +1,7 @@
 const readline = require('readline-sync');
 const { clientIdExists, createClient, updateClient, deleteClient, listClients } = require('./customerModule');
 const { listProducts, createProduct, updateProduct, deleteProduct, productIdExists } = require('./productModule');
-const { createPurchaseDetails, listPurchaseDetails, deletePurchaseDetails, comandeIdExists, updatePurchaseDetails } = require('./comandeDetailModule');
+const { createPurchaseDetails, listPurchaseDetails, deletePurchaseDetails, comandeIdExists, updatePurchaseDetails } = require('./orderModule');
 const { createPayment, paymentIdExists, updatePayment, deletePayment, listPayments } = require('./payementModule');
 
 
@@ -116,7 +116,7 @@ async function produits() {
             case '1':
                 const name = readline.question('Nom : ');
                 const description = readline.question('Description : ');
-                const stock = readline.question('Stock : ');
+                const stock = readline.questionInt('Stock : ');
                 const price = readline.question('Price : ');
                 const category = readline.question('Category : ');
                 const barcode = readline.question('Barcode : ');
@@ -136,7 +136,7 @@ async function produits() {
                 }
                 const newName = readline.question('Nom : ');
                 const newDescription = readline.question('Description : ');
-                const newStock = readline.question('Stock : ');
+                const newStock = readline.questionInt('Stock : ');
                 const newPrice = readline.question('Prix : ');
                 const newCategory = readline.question('Category : ');
                 const newBarcode = readline.question('Barcode : ');
@@ -240,7 +240,6 @@ async function comandeDetails() {
                                 console.log('Veuillez ajouter des produits avant de sauvegarder.');
                             } else {
                                 await createPurchaseDetails(order, productDetails);
-                                console.log('Commande et détails sauvegardés avec succès.');
                                 return comandeDetails(); 
                             }
                             break;
@@ -289,28 +288,45 @@ async function comandeDetails() {
                     status: newStatus
                 };
 
-                let productIdUpdate;
+                let productDetailsUpdate = [];
                 while (true) {
-                    productIdUpdate = readline.questionInt('ID du produit : ');
+                    console.log(`
+                        21. Choisir produit a modifier
+                        22. Retour 
+                    `);
+                    const choix = readline.question('Choisissez une option : ');
+                    switch (choix) {
+                        case '21':
+                            let productId;
+                            while (true) {
+                                productId = readline.questionInt('ID du produit : ');
 
-                    if (await productIdExists(productIdUpdate)) {
-                        break;
-                    } else {
-                        console.log(`Produit avec l'ID : ${productIdUpdate} n'existe pas. Veuillez essayer un autre ID.`);
+                                if (await productIdExists(productId)) {
+                                    break;
+                                } else {
+                                    console.log(`Produit avec l'ID : ${productId} n'existe pas. Veuillez essayer un autre ID.`);
+                                }
+                            }
+                            const quantity = readline.questionInt('Quantite du produit : ');
+                            const price = readline.question('Prix du produit : ');
+                            productDetailsUpdate.push({
+                                productId,
+                                quantity,
+                                price
+                            });
+                            if (productDetailsUpdate.length > 0) {
+                                await updatePurchaseDetails(purchaseIdToUpdate, ordersUpdate, productDetailsUpdate)
+                                console.log(`Commande avec l'ID : ${purchaseIdToUpdate} a été modifiée avec succès.`);
+
+                            }
+                            break;
+                        case '22':
+                            return comandeDetails(); 
+                        default:
+                            console.log('Choix invalide.');
+                            break;
                     }
                 }
-                
-                const newQuantity = readline.questionInt('Quantite du produit : ');
-                const newPrice = parseFloat(readline.question('Prix du produit : '));
-                
-                const detailsUpdate = {
-                    quantity: newQuantity,
-                    price: newPrice,
-                    productId: productIdUpdate
-                }
-
-                await updatePurchaseDetails(purchaseIdToUpdate, ordersUpdate, detailsUpdate);
-                break;
 
             case '3':
                 let purchaseIdToDelete;
@@ -363,7 +379,7 @@ async function payement() {
         switch (choice) {
             case '1':
                 const date = readline.question('Date : ');
-                const amount = parseFloat(readline.question('Montant : '))
+                const amount = readline.question('Montant : ');
                 const PMethode = readline.question('Methode de payement : ');
                 let purchaseId;
                 while (true) {
@@ -378,7 +394,7 @@ async function payement() {
                 const payement = {
                     date:date, 
                     amount:amount, 
-                    p_methode:PMethode, 
+                    payment_method:PMethode, 
                     purchase_id: purchaseId
                 }
                 await createPayment(payement)
@@ -395,7 +411,7 @@ async function payement() {
                     }
                 }
                 const newDate = readline.question('Date : ');
-                const newAmount = parseFloat(readline.question('Montant : '))
+                const newAmount = readline.question('Montant : ');
                 const newPMethode = readline.question('Methode de payement : ');
                 let NewPurchaseId;
                 while (true) {
@@ -407,7 +423,7 @@ async function payement() {
                         console.log(`Commande avec l'ID : ${NewPurchaseId} n'existe pas. Veuillez essayer un autre ID.`);
                     }
                 }
-                await updatePayment(paymentIdToUpdate, { date: newDate, amount: newAmount, p_methode: newPMethode, purchase_id: NewPurchaseId });
+                await updatePayment(paymentIdToUpdate, { date: newDate, amount: newAmount, payment_method: newPMethode, purchase_id: NewPurchaseId });
                 break;
             case '3':
                 let payementIdToDelete;

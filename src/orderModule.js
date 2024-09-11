@@ -29,7 +29,7 @@ async function createPurchaseDetails(order, productDetails) {
 
         console.log('Commande et détails créés avec succès.');
     } catch (error) {
-        console.log('Erreur lors de la création de la commande et des détails :', error.message);
+        console.log('Erreur lors de la création de la commande et des détails : ',error.message);
     } finally {
         connection.release();
     }
@@ -65,10 +65,6 @@ async function listPurchaseDetails(purchaseId) {
 async function deletePurchaseDetails(purchaseId) {
     const connection = await pool.getConnection();
     try {
-        await connection.execute(
-            'DELETE FROM order_details WHERE purchase_id = ?',
-            [purchaseId]
-        );
 
         await connection.execute(
             'DELETE FROM purchase_orders WHERE id = ?',
@@ -91,13 +87,12 @@ async function updatePurchaseDetails(purchaseId, order, details) {
             [order.date, order.deliveryAddress, order.customerId, order.trackNumber, order.status, purchaseId]
         );
 
-        console.log(`Commande avec l'ID : ${purchaseId} a été modifiée avec succès.`);
-        await connection.execute(
-            'UPDATE order_details SET quantity = ?, price = ? WHERE purchase_id = ? AND product_id = ?',
-            [details.quantity, details.price, purchaseId, details.productId]
-        );
-
-        console.log(`Détails de la commande pour le produit avec l'ID : ${details.productId} ont été modifiés avec succès.`);
+        for (const detail of details) {
+            await connection.execute(
+                'UPDATE order_details SET quantity = ?, price = ? WHERE purchase_id = ? AND product_id = ?',
+                [detail.quantity, detail.price, purchaseId, detail.productId]
+            );
+        }
     } catch (error) {
         console.log('Erreur lors de la mise à jour de la commande et des détails :', error.message);
     } finally {

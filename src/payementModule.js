@@ -13,12 +13,12 @@ async function paymentIdExists(id) {
 async function createPayment(payments) {
     const connection = await pool.getConnection();
     try {
-        const query = 'INSERT INTO payments (date, amount, p_methode, purchase_id) VALUES (?, ?, ?, ?)';
-        const [result] = await connection.execute(query, [payments.date, payments.amount, payments.p_methode, payments.purchase_id]);
+        const query = 'INSERT INTO payments (date, amount, payment_method, purchase_id) VALUES (?, ?, ?, ?)';
+        const [result] = await connection.execute(query, [payments.date, payments.amount, payments.payment_method, payments.purchase_id]);
         console.log(`Payement a été ajouter avec succes.`);
         return result.insertId;
     }catch(error){
-        console.log(error.message);
+        console.log("Erreur lors de la creation de payement : ",error.message);
     } finally {
         connection.release();
     }
@@ -28,12 +28,12 @@ async function updatePayment(id, payments) {
     const connection = await pool.getConnection();
     try {
       
-        const query = 'UPDATE payments SET date = ?, amount = ?, p_methode = ?, purchase_id = ? WHERE id = ?';
-        await connection.execute(query, [payments.date, payments.amount, payments.p_methode, payments.purchase_id, id]);    
+        const query = 'UPDATE payments SET date = ?, amount = ?, payment_method = ?, purchase_id = ? WHERE id = ?';
+        await connection.execute(query, [payments.date, payments.amount, payments.payment_method, payments.purchase_id, id]);    
         console.log(`Payement avec id: ${id} à été modifier avec succes.`);
          
     }catch (error){
-        console.log(error.message);
+        console.log("Erreur lors de la modification de payement : ",error.message);
     }finally {
         connection.release();
     }
